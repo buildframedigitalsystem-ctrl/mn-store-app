@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M&N Cart</title>
+
+    <link rel="stylesheet" href="assets/css/store.css">
+    <link rel="stylesheet" href="assets/css/responsive-fixes.css">
+
+    <link rel="manifest" href="manifest-store.json">
+    <meta name="theme-color" content="#005f2f">
+
+</head>
+
+<body>
+
+    <section class="cart-page">
+
+        <div class="cart-header">
+
+            <div>
+                <h1>🛒 Shopping Cart</h1>
+                <p>
+                    Review your selected products before checkout.
+                </p>
+            </div>
+
+            <div class="cart-header-actions">
+                <a href="index.html" class="continue-shopping-btn">
+                    ← Continue Shopping
+                </a>
+
+                <a href="customer-login.html" class="continue-shopping-btn">
+                    👤 Login
+                </a>
+            </div>
+
+        </div>
+
+        <div class="cart-layout">
+
+            <div class="cart-items-section">
+
+                <div id="cartItemsContainer">
+
+                    <div class="empty-cart">
+                        Cart is empty.
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="checkout-section">
+
+                <div class="checkout-card">
+
+                    <h2>Checkout Summary</h2>
+
+                    <div class="summary-row">
+                        <span>Items</span>
+                        <strong id="cartItemCount">0</strong>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <strong id="cartSubtotal">₱0.00</strong>
+                    </div>
+
+                    <div class="summary-row total-row">
+                        <span>Total</span>
+                        <strong id="cartTotal">₱0.00</strong>
+                    </div>
+
+                    <hr>
+
+                    <h3>Customer Information</h3>
+
+                    <form id="checkoutForm">
+
+                        <input type="text" id="customerName" placeholder="Full Name" required>
+
+                        <input type="text" id="customerMobile" placeholder="Mobile / WhatsApp" required>
+
+                        <textarea id="customerAddress" placeholder="Delivery Address" required></textarea>
+
+                        <textarea id="customerNotes" placeholder="Notes / Instructions"></textarea>
+
+                        <button type="submit" class="checkout-btn">
+                            Submit Order
+                        </button>
+
+                    </form>
+
+                    <p class="cart-helper-text">
+                        For bulk orders or special pricing, you may also request a quotation.
+                    </p>
+
+                    <a href="quotation-request.html" class="continue-shopping-btn cart-quotation-link">
+                        🧾 Request Quotation
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <script src="assets/js/api-config.js"></script>
+    <script src="assets/js/cart.js"></script>
+    <script src="assets/js/universal-search.js"></script>
+
+</body>
+
+</html>

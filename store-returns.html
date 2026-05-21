@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M&N Returns</title>
+
+    <link rel="manifest" href="manifest-store.json">
+
+    <link rel="stylesheet" href="assets/css/responsive-fixes.css">
+    <link rel="stylesheet" href="assets/css/store-operations-polish.css">
+    <link rel="stylesheet" href="assets/css/store-dashboard-v2.css?v=11">
+
+    <meta name="theme-color" content="#005f2f">
+</head>
+
+<body>
+
+    <div class="store-app-layout">
+
+        <aside class="store-sidebar">
+
+            <div class="store-branding">
+                <img src="images/branding/mn-logo.png" alt="M&N Logo">
+
+                <h2>M&N Store App</h2>
+                <p>Wholesale Partner Portal</p>
+            </div>
+
+            <nav class="store-sidebar-nav">
+                <a href="store-order-form.html">📦 Wholesale Orders</a>
+                <a href="wholesale.html">🛒 Wholesale Products</a>
+                <a href="store-deliveries.html">🚚 Deliveries</a>
+                <a href="store-payments.html">💳 Payments & Balance</a>
+                <a href="store-returns.html" class="active">↩ Returns</a>
+            </nav>
+
+        </aside>
+
+        <main class="store-main-content">
+
+            <section class="store-topbar">
+
+                <div class="store-topbar-left">
+                    <h1>Returns & Concerns</h1>
+                    <p>Submit damaged, incorrect, missing, or expired product concerns for review.</p>
+                </div>
+
+                <div class="store-account-card">
+                    <strong>M&N Partner Store</strong>
+                    <span>Return Requests: 0</span>
+                    <span>Pending Review: 0</span>
+                    <span>Status: Active</span>
+                </div>
+
+            </section>
+
+            <section class="store-dashboard-grid">
+
+                <div class="store-dashboard-card">
+                    <span>📦</span>
+                    <h3>Damaged Products</h3>
+                    <p>Report damaged or defective items.</p>
+                </div>
+
+                <div class="store-dashboard-card">
+                    <span>⚠</span>
+                    <h3>Wrong Items</h3>
+                    <p>Submit incorrect order concerns.</p>
+                </div>
+
+                <div class="store-dashboard-card">
+                    <span>↩</span>
+                    <h3>Replacement Requests</h3>
+                    <p>Track replacements and return approvals.</p>
+                </div>
+
+            </section>
+
+            <section class="store-section-card">
+
+                <div class="section-heading">
+                    <h2>Submit Return Request</h2>
+                    <p>Provide invoice and concern details for proper review.</p>
+                </div>
+
+                <form class="store-form-grid">
+
+                    <div class="store-form-group">
+                        <label>Invoice Number</label>
+                        <input type="text" placeholder="Enter invoice number">
+                    </div>
+
+                    <div class="store-form-group">
+                        <label>Reason</label>
+
+                        <select>
+                            <option>Damaged Product</option>
+                            <option>Wrong Item</option>
+                            <option>Missing Product</option>
+                            <option>Expired Product</option>
+                        </select>
+                    </div>
+
+                    <div class="store-form-group full-width">
+                        <label>Details</label>
+                        <textarea rows="5" placeholder="Enter concern details here..."></textarea>
+                    </div>
+
+                    <div class="full-width">
+                        <button type="submit" class="store-primary-btn">
+                            Submit Return Request
+                        </button>
+                    </div>
+
+                </form>
+
+            </section>
+
+        </main>
+
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,31 @@
+{
+    "id": "/mn-store-app",
+    "name": "M&N Store Partner App",
+    "short_name": "M&N Store",
+    "description": "Partner store ordering, invoices, deliveries, payments, and returns system.",
+    "start_url": "./index.html",
+    "scope": "./",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#005f2f",
+    "orientation": "portrait-primary",
+    "categories": [
+        "business",
+        "shopping",
+        "productivity"
+    ],
+    "icons": [
+        {
+            "src": "images/branding/mn-logo.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "images/branding/mn-logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}

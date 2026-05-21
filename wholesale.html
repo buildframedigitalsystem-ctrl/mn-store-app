@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M&N Wholesale Store</title>
+
+    <link rel="stylesheet" href="assets/css/store.css?v=20">
+
+
+    <link rel="manifest" href="manifest-store.json">
+    <meta name="theme-color" content="#005f2f">
+</head>
+
+<body data-store-page="wholesale">
+
+    <section class="store-page-header wholesale-header">
+
+        <div class="store-header-left">
+
+            <h1>Wholesale Store</h1>
+
+            <p>
+                Bulk pricing and reseller-ready products for stores,
+                groceries, sari-sari stores, distributors, and businesses.
+            </p>
+
+            <div class="store-page-links">
+
+                <a href="index.html">
+                    🏠 Store Home
+                </a>
+
+                <a href="wholesale.html">
+                    📦 Wholesale
+                </a>
+
+                <a href="cart.html">
+                    🛒 Cart
+                </a>
+
+                <a href="store-order-form.html">
+                    📋 Orders
+                </a>
+
+                <a href="store-payments.html">
+                    💳 Payments
+                </a>
+
+            </div>
+
+            <div class="store-header-actions">
+
+                <a href="reseller-application.html" class="header-action-card">
+                    🏪
+                    <div>
+                        <strong>Become a Reseller</strong>
+                        <span>Apply for wholesale pricing access</span>
+                    </div>
+                </a>
+
+                <a href="store-order-form.html" class="header-action-card">
+                    📦
+                    <div>
+                        <strong>Bulk Orders</strong>
+                        <span>Create wholesale orders instantly</span>
+                    </div>
+                </a>
+
+                <a href="delivery-booking.html" class="header-action-card">
+                    🚚
+                    <div>
+                        <strong>Regionwide Delivery</strong>
+                        <span>Fast delivery for partner stores</span>
+                    </div>
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="store-header-right">
+
+            <img src="images/branding/mn-logo.png" alt="M&N Logo">
+
+            <h3>M&N Consumer Goods</h3>
+
+            <p>
+                Retail • Wholesale • Distribution
+            </p>
+
+            <div class="store-header-contact">
+                <span>📱 +639052273431</span>
+                <span>✉️ kokiks@gmail.com</span>
+                <span>📘 Nico Torrevillas</span>
+            </div>
+
+        </div>
+
+    </section>
+
+    <section class="store-toolbar">
+
+        <input type="text" id="storeSearch" placeholder="Search wholesale products...">
+
+        <select id="categoryFilter">
+            <option value="all">All Categories</option>
+        </select>
+
+    </section>
+
+    <section id="products">
+
+        <div class="section-title-row">
+
+            <div>
+                <h2>Wholesale Products</h2>
+
+                <p>
+                    Products available for bulk buying,
+                    reseller supply, and business purchasing.
+                </p>
+            </div>
+
+            <a href="quotation-request.html" class="view-all-link">
+                Request Bulk Pricing →
+            </a>
+
+        </div>
+
+        <div class="product-grid" id="productGrid">
+            <!-- PRODUCTS LOAD HERE -->
+        </div>
+
+        <button type="button" id="loadMoreProducts">
+            Load More Products
+        </button>
+
+    </section>
+
+    <!-- =========================================
+         PRODUCT MODAL
+    ========================================= -->
+
+    <div id="productModal" class="product-modal">
+
+        <div class="product-modal-content">
+
+            <button class="close-modal" onclick="closeProductModal()">
+                ✕
+            </button>
+
+            <div class="modal-image-wrap">
+                <img id="modalProductImage" src="" alt="">
+            </div>
+
+            <div class="modal-details">
+
+                <div id="modalBadges" class="modal-badges"></div>
+
+                <h2 id="modalProductName">
+                    Product Name
+                </h2>
+
+                <p id="modalProductCategory" class="modal-category">
+                    Category
+                </p>
+
+                <div id="modalPriceBox" class="modal-price-box"></div>
+
+                <p id="modalProductDescription" class="modal-description">
+                    Product description here...
+                </p>
+
+                <div class="modal-actions">
+
+                    <a id="modalWhatsAppBtn" href="#" target="_blank" class="modal-btn primary-btn">
+                        💬 WhatsApp Inquiry
+                    </a>
+
+                    <button class="modal-btn secondary-btn" onclick="closeProductModal()">
+                        Close
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="assets/js/store.js?v=12"></script>
+
+
+    <body>
+
+</html>
