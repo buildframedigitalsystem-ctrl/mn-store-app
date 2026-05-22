@@ -2,21 +2,38 @@
    STORE SESSION SYSTEM
 ========================================= */
 
+const PUBLIC_STORE_PAGES = [
+    "store-login.html",
+    "store-signup.html"
+];
+
 function getStoreSession_() {
-    return JSON.parse(
-        localStorage.getItem("mnStoreSession")
-    );
+    try {
+        return JSON.parse(localStorage.getItem("mnStoreSession") || "{}");
+    } catch (error) {
+        return {};
+    }
 }
 
 function saveStoreSession_(data) {
-    localStorage.setItem(
-        "mnStoreSession",
-        JSON.stringify(data)
-    );
+    localStorage.setItem("mnStoreSession", JSON.stringify(data || {}));
 }
 
 function clearStoreSession_() {
     localStorage.removeItem("mnStoreSession");
+}
+
+function requireStoreLogin_() {
+    const page = window.location.pathname.split("/").pop();
+    const isPublicPage = PUBLIC_STORE_PAGES.includes(page);
+
+    if (isPublicPage) return;
+
+    const session = getStoreSession_();
+
+    if (!session.CustomerID) {
+        window.location.href = "store-login.html";
+    }
 }
 
 /* =========================================
@@ -24,27 +41,15 @@ function clearStoreSession_() {
 ========================================= */
 
 function getStoreName_() {
-    const session = getStoreSession_();
-
-    return session?.StoreName || "Store";
+    return getStoreSession_().StoreName || "Store";
 }
 
 function getStoreType_() {
-    const session = getStoreSession_();
-
-    return session?.StoreType || "Retail";
-}
-
-function getPriceLevel_() {
-    const session = getStoreSession_();
-
-    return session?.PriceLevel || "Retail";
+    return getStoreSession_().CustomerType || "Wholesale Store";
 }
 
 function getOutstandingBalance_() {
-    const session = getStoreSession_();
-
-    return session?.OutstandingBalance || 0;
+    return getStoreSession_().OutstandingBalance || 0;
 }
 
 /* =========================================
@@ -52,38 +57,17 @@ function getOutstandingBalance_() {
 ========================================= */
 
 function displayStoreSessionData_() {
-
-    const storeTargets =
-        document.querySelectorAll("[data-store-name]");
-
-    const typeTargets =
-        document.querySelectorAll("[data-store-type]");
-
-    const priceTargets =
-        document.querySelectorAll("[data-price-level]");
-
-    const balanceTargets =
-        document.querySelectorAll("[data-balance]");
-
-    storeTargets.forEach(el => {
+    document.querySelectorAll("[data-store-name]").forEach(el => {
         el.textContent = getStoreName_();
     });
 
-    typeTargets.forEach(el => {
+    document.querySelectorAll("[data-store-type]").forEach(el => {
         el.textContent = getStoreType_();
     });
 
-    priceTargets.forEach(el => {
-        el.textContent = getPriceLevel_();
+    document.querySelectorAll("[data-balance]").forEach(el => {
+        el.textContent = "₱" + Number(getOutstandingBalance_()).toLocaleString();
     });
-
-    balanceTargets.forEach(el => {
-        el.textContent =
-            "₱" +
-            Number(getOutstandingBalance_())
-                .toLocaleString();
-    });
-
 }
 
 /* =========================================
@@ -91,7 +75,6 @@ function displayStoreSessionData_() {
 ========================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
-
+    requireStoreLogin_();
     displayStoreSessionData_();
-
 });

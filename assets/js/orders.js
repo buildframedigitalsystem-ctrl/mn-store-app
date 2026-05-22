@@ -10,26 +10,92 @@ let signatureCanvas = null;
 let signatureCtx = null;
 let isSigning = false;
 
+const STORE_CART_KEY = "mn_store_partner_cart";
+
 /* =========================================
    START
 ========================================= */
 
 document.addEventListener("DOMContentLoaded", () => {
+    requireSessionSafe_();
 
     initializeSignaturePad_();
     initializeOrderButtons_();
 
+    fillStoreInfo_();
+    loadCartFromStorage_();
+
     loadStoreProducts_();
     loadRecentOrders_();
-
 });
+
+/* =========================================
+   SESSION HELPERS
+========================================= */
+
+function getCurrentStoreSession_() {
+    try {
+        if (typeof getStoreSession_ === "function") {
+            return getStoreSession_();
+        }
+
+        return JSON.parse(
+            localStorage.getItem("mnStoreSession") || "{}"
+        );
+    } catch (error) {
+        return {};
+    }
+}
+
+function requireSessionSafe_() {
+    const session = getCurrentStoreSession_();
+
+    if (!session.CustomerID) {
+        window.location.href = "store-login.html";
+    }
+}
+
+function fillStoreInfo_() {
+    const session = getCurrentStoreSession_();
+
+    const customerNameField =
+        document.getElementById("customerName");
+
+    const contactField =
+        document.getElementById("contactNumber");
+
+    const statusText =
+        document.getElementById("storeStatusText");
+
+    const balanceText =
+        document.getElementById("outstandingBalanceText");
+
+    if (customerNameField) {
+        customerNameField.value =
+            session.StoreName || "";
+    }
+
+    if (contactField) {
+        contactField.value =
+            session.ContactNumber || "";
+    }
+
+    if (statusText) {
+        statusText.innerText =
+            session.AccountStatus || "ACTIVE";
+    }
+
+    if (balanceText) {
+        balanceText.innerText =
+            "₱" + formatMoney_(session.OutstandingBalance || 0);
+    }
+}
 
 /* =========================================
    API URL
 ========================================= */
 
 function getApiUrl_() {
-
     if (
         typeof API !== "undefined" &&
         API.BASE_URL
@@ -37,8 +103,53 @@ function getApiUrl_() {
         return API.BASE_URL;
     }
 
-    return "YOUR_APPS_SCRIPT_WEBAPP_URL";
+    return "https://script.google.com/macros/s/AKfycbxVDhIAQceRvhmF0XXTG0GNiecaOlkUv3UBBd0SC-Hyu-AA51Xfg5v02gaUNIAXyiII/exec"
+}
 
+/* =========================================
+   LOAD CART FROM HOMEPAGE / CART PAGE
+========================================= */
+
+function loadCartFromStorage_() {
+    try {
+        const savedCart =
+            JSON.parse(
+                localStorage.getItem(STORE_CART_KEY) || "[]"
+            );
+
+        orderCart = savedCart.map(item => {
+            const quantity =
+                Number(item.quantity || item.Qty || 1);
+
+            const price =
+                Number(item.price || item.Price || 0);
+
+            return {
+                productId:
+                    item.productId ||
+                    item.ProductID ||
+                    item.id ||
+                    item.name ||
+                    "",
+
+                name:
+                    item.name ||
+                    item.ProductName ||
+                    "Unnamed Product",
+
+                quantity,
+                price,
+                total: quantity * price
+            };
+        });
+
+        renderOrderCart_();
+
+    } catch (error) {
+        console.error("Cart load error:", error);
+        orderCart = [];
+        renderOrderCart_();
+    }
 }
 
 /* =========================================
@@ -46,14 +157,12 @@ function getApiUrl_() {
 ========================================= */
 
 async function loadStoreProducts_() {
-
     const productSelect =
         document.getElementById("productSelect");
 
     if (!productSelect) return;
 
     try {
-
         productSelect.innerHTML = `
             <option value="">
                 Loading products...
@@ -74,21 +183,18 @@ async function loadStoreProducts_() {
         const rows =
             data.rows ||
             data.products ||
+            data.data ||
             [];
 
         storeProducts =
-            Array.isArray(rows)
-                ? rows
-                : [];
+            Array.isArray(rows) ? rows : [];
 
         if (!storeProducts.length) {
-
             productSelect.innerHTML = `
                 <option value="">
                     No products found
                 </option>
             `;
-
             return;
         }
 
@@ -98,13 +204,15 @@ async function loadStoreProducts_() {
             </option>
 
             ${storeProducts.map((product, index) => {
-
             const name =
                 product.ProductName ||
+                product.productName ||
+                product.Name ||
                 "Unnamed Product";
 
             const price =
                 Number(
+                    product.PromoPrice ||
                     product.WholesalePrice ||
                     product.SellingPrice ||
                     0
@@ -112,16 +220,13 @@ async function loadStoreProducts_() {
 
             return `
                     <option value="${index}">
-                        ${escapeHTML_(name)}
-                        - ₱${formatMoney_(price)}
+                        ${escapeHTML_(name)} - ₱${formatMoney_(price)}
                     </option>
                 `;
-
         }).join("")}
         `;
 
     } catch (error) {
-
         console.error(error);
 
         productSelect.innerHTML = `
@@ -129,9 +234,7 @@ async function loadStoreProducts_() {
                 Failed loading products
             </option>
         `;
-
     }
-
 }
 
 /* =========================================
@@ -139,7 +242,6 @@ async function loadStoreProducts_() {
 ========================================= */
 
 function initializeOrderButtons_() {
-
     const addToCartBtn =
         document.getElementById("addToCartBtn");
 
@@ -169,7 +271,6 @@ function initializeOrderButtons_() {
             submitStoreOrder_
         );
     }
-
 }
 
 /* =========================================
@@ -177,7 +278,6 @@ function initializeOrderButtons_() {
 ========================================= */
 
 function addSelectedProductToCart_() {
-
     const productSelect =
         document.getElementById("productSelect");
 
@@ -193,16 +293,12 @@ function addSelectedProductToCart_() {
         Number(quantityInput.value || 1);
 
     if (productIndex === "") {
-
         alert("Please select product.");
-
         return;
     }
 
     if (quantity <= 0) {
-
         alert("Invalid quantity.");
-
         return;
     }
 
@@ -210,9 +306,7 @@ function addSelectedProductToCart_() {
         storeProducts[productIndex];
 
     if (!product) {
-
         alert("Product not found.");
-
         return;
     }
 
@@ -223,10 +317,13 @@ function addSelectedProductToCart_() {
 
     const name =
         product.ProductName ||
+        product.productName ||
+        product.Name ||
         "Unnamed Product";
 
     const price =
         Number(
+            product.PromoPrice ||
             product.WholesalePrice ||
             product.SellingPrice ||
             0
@@ -234,20 +331,14 @@ function addSelectedProductToCart_() {
 
     const existing =
         orderCart.find(item =>
-            String(item.productId) ===
-            String(productId)
+            String(item.productId) === String(productId)
         );
 
     if (existing) {
-
         existing.quantity += quantity;
-
         existing.total =
-            existing.quantity *
-            existing.price;
-
+            existing.quantity * existing.price;
     } else {
-
         orderCart.push({
             productId,
             name,
@@ -255,14 +346,21 @@ function addSelectedProductToCart_() {
             price,
             total: quantity * price
         });
-
     }
+
+    saveCartToStorage_();
 
     productSelect.value = "";
     quantityInput.value = 1;
 
     renderOrderCart_();
+}
 
+function saveCartToStorage_() {
+    localStorage.setItem(
+        STORE_CART_KEY,
+        JSON.stringify(orderCart)
+    );
 }
 
 /* =========================================
@@ -270,7 +368,6 @@ function addSelectedProductToCart_() {
 ========================================= */
 
 function renderOrderCart_() {
-
     const cartTableBody =
         document.getElementById("cartTableBody");
 
@@ -280,7 +377,6 @@ function renderOrderCart_() {
     if (!cartTableBody) return;
 
     if (!orderCart.length) {
-
         cartTableBody.innerHTML = `
             <tr>
                 <td colspan="5">
@@ -298,50 +394,30 @@ function renderOrderCart_() {
 
     cartTableBody.innerHTML =
         orderCart.map((item, index) => `
-
             <tr>
-
-                <td>
-                    ${escapeHTML_(item.name)}
-                </td>
-
-                <td>
-                    ${item.quantity}
-                </td>
-
-                <td>
-                    ₱${formatMoney_(item.price)}
-                </td>
-
-                <td>
-                    ₱${formatMoney_(item.total)}
-                </td>
-
+                <td>${escapeHTML_(item.name)}</td>
+                <td>${item.quantity}</td>
+                <td>₱${formatMoney_(item.price)}</td>
+                <td>₱${formatMoney_(item.total)}</td>
                 <td>
                     <button
                         type="button"
                         onclick="removeCartItem_(${index})">
-
                         Remove
-
                     </button>
                 </td>
-
             </tr>
-
         `).join("");
 
     const total =
         orderCart.reduce(
-            (sum, item) =>
-                sum + item.total,
+            (sum, item) => sum + Number(item.total || 0),
             0
         );
 
     if (totalAmountInput) {
         totalAmountInput.value = total;
     }
-
 }
 
 /* =========================================
@@ -349,11 +425,9 @@ function renderOrderCart_() {
 ========================================= */
 
 function removeCartItem_(index) {
-
     orderCart.splice(index, 1);
-
+    saveCartToStorage_();
     renderOrderCart_();
-
 }
 
 /* =========================================
@@ -361,11 +435,8 @@ function removeCartItem_(index) {
 ========================================= */
 
 function initializeSignaturePad_() {
-
     signatureCanvas =
-        document.getElementById(
-            "signatureCanvas"
-        );
+        document.getElementById("signatureCanvas");
 
     if (!signatureCanvas) return;
 
@@ -380,25 +451,10 @@ function initializeSignaturePad_() {
 
     signatureCanvas.style.touchAction = "none";
 
-    signatureCanvas.addEventListener(
-        "mousedown",
-        startSignature_
-    );
-
-    signatureCanvas.addEventListener(
-        "mousemove",
-        drawSignature_
-    );
-
-    signatureCanvas.addEventListener(
-        "mouseup",
-        stopSignature_
-    );
-
-    signatureCanvas.addEventListener(
-        "mouseleave",
-        stopSignature_
-    );
+    signatureCanvas.addEventListener("mousedown", startSignature_);
+    signatureCanvas.addEventListener("mousemove", drawSignature_);
+    signatureCanvas.addEventListener("mouseup", stopSignature_);
+    signatureCanvas.addEventListener("mouseleave", stopSignature_);
 
     signatureCanvas.addEventListener(
         "touchstart",
@@ -412,48 +468,27 @@ function initializeSignaturePad_() {
         { passive: false }
     );
 
-    signatureCanvas.addEventListener(
-        "touchend",
-        stopSignature_
-    );
-
+    signatureCanvas.addEventListener("touchend", stopSignature_);
 }
 
-/* =========================================
-   SIGNATURE HELPERS
-========================================= */
-
 function getSignaturePosition_(event) {
-
     const rect =
         signatureCanvas.getBoundingClientRect();
 
-    if (
-        event.touches &&
-        event.touches.length
-    ) {
-
+    if (event.touches && event.touches.length) {
         return {
-            x:
-                event.touches[0].clientX -
-                rect.left,
-
-            y:
-                event.touches[0].clientY -
-                rect.top
+            x: event.touches[0].clientX - rect.left,
+            y: event.touches[0].clientY - rect.top
         };
-
     }
 
     return {
         x: event.clientX - rect.left,
         y: event.clientY - rect.top
     };
-
 }
 
 function startSignature_(event) {
-
     event.preventDefault();
 
     isSigning = true;
@@ -467,11 +502,9 @@ function startSignature_(event) {
         position.x,
         position.y
     );
-
 }
 
 function drawSignature_(event) {
-
     if (!isSigning) return;
 
     event.preventDefault();
@@ -485,18 +518,14 @@ function drawSignature_(event) {
     );
 
     signatureCtx.stroke();
-
 }
 
 function stopSignature_() {
-
     isSigning = false;
-
 }
 
 function clearSignature_() {
-
-    if (!signatureCanvas) return;
+    if (!signatureCanvas || !signatureCtx) return;
 
     signatureCtx.clearRect(
         0,
@@ -504,19 +533,16 @@ function clearSignature_() {
         signatureCanvas.width,
         signatureCanvas.height
     );
-
 }
 
 function resizeSignatureCanvas_() {
-
     if (!signatureCanvas) return;
 
     const rect =
         signatureCanvas.getBoundingClientRect();
 
-    signatureCanvas.width = rect.width;
-    signatureCanvas.height = rect.height;
-
+    signatureCanvas.width = rect.width || 700;
+    signatureCanvas.height = rect.height || 150;
 }
 
 /* =========================================
@@ -524,79 +550,65 @@ function resizeSignatureCanvas_() {
 ========================================= */
 
 async function submitStoreOrder_(event) {
-
     event.preventDefault();
 
     if (!orderCart.length) {
-
-        alert(
-            "Please add product first."
-        );
-
+        alert("Please add product first.");
         return;
     }
 
+    const session =
+        getCurrentStoreSession_();
+
     const submitBtn =
-        document.getElementById(
-            "submitOrderBtn"
-        );
+        document.getElementById("submitOrderBtn");
 
     if (submitBtn) {
-
         submitBtn.disabled = true;
-        submitBtn.innerText =
-            "Submitting...";
-
+        submitBtn.innerText = "Submitting...";
     }
 
     const payload = {
-
         action: "submitStoreOrder",
 
-        storeId: "STORE001",
+        storeId:
+            session.CustomerID || "",
+
+        storeName:
+            session.StoreName || "",
 
         customerName:
-            document.getElementById(
-                "customerName"
-            )?.value || "",
+            session.StoreName ||
+            document.getElementById("customerName")?.value ||
+            "",
 
         contactNumber:
-            document.getElementById(
-                "contactNumber"
-            )?.value || "",
+            session.ContactNumber ||
+            document.getElementById("contactNumber")?.value ||
+            "",
 
         orderType: "Wholesale",
 
         paymentStatus:
-            document.getElementById(
-                "paymentStatus"
-            )?.value || "Unpaid",
+            document.getElementById("paymentStatus")?.value || "Unpaid",
 
         orderNotes:
-            document.getElementById(
-                "orderNotes"
-            )?.value || "",
+            document.getElementById("orderNotes")?.value || "",
 
         totalAmount:
             Number(
-                document.getElementById(
-                    "totalAmount"
-                )?.value || 0
+                document.getElementById("totalAmount")?.value || 0
             ),
 
         signatureImage:
             signatureCanvas
-                ? signatureCanvas.toDataURL(
-                    "image/png"
-                )
+                ? signatureCanvas.toDataURL("image/png")
                 : "",
 
         items: orderCart
-
     };
 
     try {
-
         const response =
             await fetch(getApiUrl_(), {
                 method: "POST",
@@ -607,51 +619,33 @@ async function submitStoreOrder_(event) {
             await response.json();
 
         if (!data.success) {
-
             throw new Error(
-                data.message ||
-                "Submit failed."
+                data.message || "Submit failed."
             );
-
         }
 
-        alert(
-            "Order submitted successfully."
-        );
+        alert("Order submitted successfully.");
 
         orderCart = [];
+        localStorage.removeItem(STORE_CART_KEY);
 
         renderOrderCart_();
-
         clearSignature_();
 
-        document.getElementById(
-            "orderForm"
-        )?.reset();
+        document.getElementById("orderForm")?.reset();
 
+        fillStoreInfo_();
         loadRecentOrders_();
 
     } catch (error) {
-
         console.error(error);
-
-        alert(
-            "Failed submitting order."
-        );
-
+        alert("Failed submitting order.");
     } finally {
-
         if (submitBtn) {
-
             submitBtn.disabled = false;
-
-            submitBtn.innerText =
-                "Submit Order";
-
+            submitBtn.innerText = "Submit Order";
         }
-
     }
-
 }
 
 /* =========================================
@@ -659,13 +653,13 @@ async function submitStoreOrder_(event) {
 ========================================= */
 
 async function loadRecentOrders_() {
-
     const tbody =
-        document.getElementById(
-            "ordersTableBody"
-        );
+        document.getElementById("ordersTableBody");
 
     if (!tbody) return;
+
+    const session =
+        getCurrentStoreSession_();
 
     tbody.innerHTML = `
         <tr>
@@ -676,12 +670,12 @@ async function loadRecentOrders_() {
     `;
 
     try {
-
         const response =
             await fetch(getApiUrl_(), {
                 method: "POST",
                 body: JSON.stringify({
-                    action: "getStoreOrders"
+                    action: "getStoreOrders",
+                    storeId: session.CustomerID || ""
                 })
             });
 
@@ -689,7 +683,6 @@ async function loadRecentOrders_() {
             await response.json();
 
         if (!result.success) {
-
             tbody.innerHTML = `
                 <tr>
                     <td colspan="7">
@@ -697,15 +690,15 @@ async function loadRecentOrders_() {
                     </td>
                 </tr>
             `;
-
             return;
         }
 
         const orders =
             result.rows || [];
 
-        if (!orders.length) {
+        updateSummaryCards_(orders);
 
+        if (!orders.length) {
             tbody.innerHTML = `
                 <tr>
                     <td colspan="7">
@@ -713,59 +706,29 @@ async function loadRecentOrders_() {
                     </td>
                 </tr>
             `;
-
             return;
         }
 
         tbody.innerHTML =
             orders.map(order => `
-
                 <tr>
-
+                    <td>${order.OrderID || "-"}</td>
+                    <td>${order.CustomerName || "-"}</td>
+                    <td>${order.OrderType || "-"}</td>
+                    <td>₱${formatMoney_(order.TotalAmount)}</td>
+                    <td>${order.PaymentStatus || "-"}</td>
+                    <td>${order.DeliveryStatus || "-"}</td>
                     <td>
-                        ${order.OrderID || "-"}
-                    </td>
-
-                    <td>
-                        ${order.CustomerName || "-"}
-                    </td>
-
-                    <td>
-                        ${order.OrderType || "-"}
-                    </td>
-
-                    <td>
-                        ₱${formatMoney_(
-                order.TotalAmount
-            )}
-                    </td>
-
-                    <td>
-                        ${order.PaymentStatus || "-"}
-                    </td>
-
-                    <td>
-                        ${order.DeliveryStatus || "-"}
-                    </td>
-
-                    <td>
-
                         <button
                             type="button"
                             onclick="viewInvoice_('${order.InvoiceID || order.OrderID || ""}')">
-
                             View Invoice
-
                         </button>
-
                     </td>
-
                 </tr>
-
             `).join("");
 
     } catch (error) {
-
         console.error(error);
 
         tbody.innerHTML = `
@@ -775,9 +738,58 @@ async function loadRecentOrders_() {
                 </td>
             </tr>
         `;
+    }
+}
 
+/* =========================================
+   SUMMARY CARDS
+========================================= */
+
+function updateSummaryCards_(orders) {
+    const todayOrdersText =
+        document.getElementById("todayOrdersText");
+
+    const pendingDeliveriesText =
+        document.getElementById("pendingDeliveriesText");
+
+    const balanceText =
+        document.getElementById("outstandingBalanceText");
+
+    const session =
+        getCurrentStoreSession_();
+
+    const today =
+        new Date().toDateString();
+
+    const todayOrders =
+        orders.filter(order => {
+            const dateValue =
+                order.OrderDate || order.CreatedAt;
+
+            if (!dateValue) return false;
+
+            return new Date(dateValue).toDateString() === today;
+        });
+
+    const pendingDeliveries =
+        orders.filter(order =>
+            String(order.DeliveryStatus || "").toLowerCase() !== "delivered"
+        );
+
+    if (todayOrdersText) {
+        todayOrdersText.innerText =
+            todayOrders.length;
     }
 
+    if (pendingDeliveriesText) {
+        pendingDeliveriesText.innerText =
+            pendingDeliveries.length;
+    }
+
+    if (balanceText) {
+        balanceText.innerText =
+            "₱" + formatMoney_(session.OutstandingBalance || 0);
+    }
 }
 
 /* =========================================
@@ -785,7 +797,6 @@ async function loadRecentOrders_() {
 ========================================= */
 
 function viewInvoice_(invoiceId) {
-
     const row =
         document
             .querySelector(`button[onclick="viewInvoice_('${invoiceId}')"]`)
@@ -799,97 +810,61 @@ function viewInvoice_(invoiceId) {
     const cells =
         row.querySelectorAll("td");
 
-    const invoiceWindow =
-        window.open("", "_blank");
+    setInvoiceText_("invoiceIdText", invoiceId);
+    setInvoiceText_("invoiceCustomerText", cells[1]?.innerText || "-");
+    setInvoiceText_("invoiceContactText", document.getElementById("contactNumber")?.value || "-");
+    setInvoiceText_("invoiceOrderTypeText", cells[2]?.innerText || "-");
+    setInvoiceText_("invoicePaymentStatusText", cells[4]?.innerText || "-");
+    setInvoiceText_("invoiceDeliveryStatusText", cells[5]?.innerText || "-");
+    setInvoiceText_("invoiceDateText", new Date().toLocaleString("en-PH"));
+    setInvoiceText_("invoiceTotalText", cells[3]?.innerText || "₱0.00");
+    setInvoiceText_("invoiceNotesText", document.getElementById("orderNotes")?.value || "-");
 
-    invoiceWindow.document.write(`
-        <html>
-            <head>
-                <title>${invoiceId}</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        padding: 40px;
-                        color: #0f172a;
-                    }
+    const signatureImg =
+        document.getElementById("invoiceSignatureImage");
 
-                    .invoice-box {
-                        max-width: 800px;
-                        margin: auto;
-                        border: 1px solid #e2e8f0;
-                        border-radius: 18px;
-                        padding: 32px;
-                    }
+    if (signatureImg) {
+        if (
+            signatureCanvas &&
+            signatureCanvas.toDataURL("image/png") !==
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII="
+        ) {
+            signatureImg.src =
+                signatureCanvas.toDataURL("image/png");
 
-                    h1 {
-                        color: #005f2f;
-                        margin-bottom: 4px;
-                    }
+            signatureImg.style.display = "block";
+        } else {
+            signatureImg.removeAttribute("src");
+            signatureImg.style.display = "none";
+        }
+    }
 
-                    .line {
-                        margin: 12px 0;
-                    }
+    const modal =
+        document.getElementById("invoiceModal");
 
-                    strong {
-                        display: inline-block;
-                        width: 160px;
-                    }
+    if (modal) {
+        modal.style.display = "flex";
+        modal.style.visibility = "visible";
+        modal.style.opacity = "1";
+    }
+}
 
-                    .total {
-                        font-size: 28px;
-                        font-weight: 900;
-                        color: #005f2f;
-                        margin-top: 24px;
-                    }
+function setInvoiceText_(id, value) {
+    const element =
+        document.getElementById(id);
 
-                    button {
-                        margin-top: 30px;
-                        padding: 12px 22px;
-                        border: none;
-                        border-radius: 10px;
-                        background: #005f2f;
-                        color: white;
-                        font-weight: 800;
-                        cursor: pointer;
-                    }
-                </style>
-            </head>
+    if (element) {
+        element.innerText = value || "-";
+    }
+}
 
-            <body>
-                <div class="invoice-box">
-                    <h1>M&N Consumer Goods</h1>
-                    <p>Wholesale Invoice</p>
+function closeSimpleInvoice_() {
+    const modal =
+        document.getElementById("invoiceModal");
 
-                    <div class="line"><strong>Invoice ID:</strong> ${invoiceId}</div>
-                    <div class="line"><strong>Order ID:</strong> ${cells[0]?.innerText || "-"}</div>
-                    <div class="line"><strong>Customer:</strong> ${cells[1]?.innerText || "-"}</div>
-                    <div class="line"><strong>Order Type:</strong> ${cells[2]?.innerText || "-"}</div>
-                    <div class="line"><strong>Payment:</strong> ${cells[4]?.innerText || "-"}</div>
-                    <div class="line"><strong>Status:</strong> ${cells[5]?.innerText || "-"}</div>
-                    
-                    <div class="line">
-                      <strong>Date & Time:</strong>
-
-                       ${new Date().toLocaleString("en-PH", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "numeric",
-        minute: "2-digit"
-    })}
-                    </div>
-
-                    <div class="total">
-                        Total: ${cells[3]?.innerText || "₱0.00"}
-                    </div>
-
-                    <button onclick="window.print()">Print Invoice</button>
-                </div>
-            </body>
-        </html>
-    `);
-
-    invoiceWindow.document.close();
+    if (modal) {
+        modal.classList.remove("active");
+    }
 }
 
 /* =========================================
@@ -897,23 +872,19 @@ function viewInvoice_(invoiceId) {
 ========================================= */
 
 function formatMoney_(value) {
-
     return Number(
         value || 0
     ).toLocaleString("en-PH", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
-
 }
 
 function escapeHTML_(value) {
-
     return String(value || "")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
-
 }

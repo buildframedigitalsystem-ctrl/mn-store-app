@@ -7,7 +7,7 @@
     <title>M&N Wholesale Store</title>
 
     <link rel="stylesheet" href="assets/css/store.css?v=20">
-
+    <link rel="stylesheet" href="assets/css/responsive-fixes.css">
 
     <link rel="manifest" href="manifest-store.json">
     <meta name="theme-color" content="#005f2f">
@@ -37,11 +37,7 @@
                 </a>
 
                 <a href="cart.html">
-                    🛒 Cart
-                </a>
-
-                <a href="store-order-form.html">
-                    📋 Orders
+                    🛒 My Cart
                 </a>
 
                 <a href="store-payments.html">
@@ -52,19 +48,19 @@
 
             <div class="store-header-actions">
 
-                <a href="reseller-application.html" class="header-action-card">
-                    🏪
+                <a href="cart.html" class="header-action-card">
+                    🛒
                     <div>
-                        <strong>Become a Reseller</strong>
-                        <span>Apply for wholesale pricing access</span>
+                        <strong>View Cart</strong>
+                        <span>Review selected products before checkout</span>
                     </div>
                 </a>
 
                 <a href="store-order-form.html" class="header-action-card">
-                    📦
+                    🧾
                     <div>
-                        <strong>Bulk Orders</strong>
-                        <span>Create wholesale orders instantly</span>
+                        <strong>Finalize Checkout</strong>
+                        <span>Sign and submit your final order</span>
                     </div>
                 </a>
 
@@ -118,13 +114,12 @@
                 <h2>Wholesale Products</h2>
 
                 <p>
-                    Products available for bulk buying,
-                    reseller supply, and business purchasing.
+                    Choose products below, add them to cart, then proceed to checkout.
                 </p>
             </div>
 
-            <a href="quotation-request.html" class="view-all-link">
-                Request Bulk Pricing →
+            <a href="cart.html" class="view-all-link">
+                View Cart →
             </a>
 
         </div>
@@ -139,10 +134,7 @@
 
     </section>
 
-    <!-- =========================================
-         PRODUCT MODAL
-    ========================================= -->
-
+    <!-- PRODUCT MODAL -->
     <div id="productModal" class="product-modal">
 
         <div class="product-modal-content">
@@ -152,16 +144,14 @@
             </button>
 
             <div class="modal-image-wrap">
-                <img id="modalProductImage" src="" alt="">
+                <img id="modalProductImage" src="" alt="Product image">
             </div>
 
             <div class="modal-details">
 
                 <div id="modalBadges" class="modal-badges"></div>
 
-                <h2 id="modalProductName">
-                    Product Name
-                </h2>
+                <h2 id="modalProductName">Product Name</h2>
 
                 <p id="modalProductCategory" class="modal-category">
                     Category
@@ -175,11 +165,11 @@
 
                 <div class="modal-actions">
 
-                    <a id="modalWhatsAppBtn" href="#" target="_blank" class="modal-btn primary-btn">
-                        💬 WhatsApp Inquiry
-                    </a>
+                    <button type="button" id="modalAddToCartBtn" class="modal-btn primary-btn">
+                        🛒 Add To Cart
+                    </button>
 
-                    <button class="modal-btn secondary-btn" onclick="closeProductModal()">
+                    <button type="button" class="modal-btn secondary-btn" onclick="closeProductModal()">
                         Close
                     </button>
 
@@ -191,10 +181,10 @@
 
     </div>
 
+    <script src="assets/js/api-config.js"></script>
+    <script src="assets/js/store-session.js"></script>
+    <script src="assets/js/store.js?v=13"></script>
 
-    <script src="assets/js/store.js?v=12"></script>
-
-
-    <body>
+</body>
 
 </html>

@@ -263,7 +263,9 @@ function renderProducts(products, mode) {
 ================================ */
 
 function createProductCard(product, mode) {
-    const productIndex = getProductIndex_(product);
+
+    const productIndex =
+        getProductIndex_(product);
 
     const name =
         product.ProductName ||
@@ -281,30 +283,89 @@ function createProductCard(product, mode) {
         product.description ||
         "";
 
-    const image = getProductImage(product);
+    const image =
+        getProductImage(product);
 
     const wholesalePrice =
-        Number(product.WholesalePrice || product.wholesalePrice || 0);
+        Number(
+            product.WholesalePrice ||
+            product.wholesalePrice ||
+            0
+        );
 
     const promoPrice =
-        Number(product.PromoPrice || product.promoPrice || 0);
+        Number(
+            product.PromoPrice ||
+            product.promoPrice ||
+            0
+        );
 
-    const priceHTML = getPriceHTML({
-        mode,
-        wholesalePrice,
-        promoPrice,
-        discountLabel: product.DiscountLabel || "",
-        bundleName: product.BundleName || ""
-    });
+    const priceHTML =
+        getPriceHTML({
+            mode,
+            wholesalePrice,
+            promoPrice,
+            discountLabel:
+                product.DiscountLabel || "",
+            bundleName:
+                product.BundleName || ""
+        });
+
+    /* ===============================
+       STOCK DISPLAY
+    ================================ */
+
+    const stockCount =
+        Number(
+            product.CurrentStock ||
+            product.StockQty ||
+            product.Quantity ||
+            0
+        );
+
+    const showStockCount =
+        String(
+            product.ShowStockCount || ""
+        ).toUpperCase() === "YES";
+
+    const stockHTML =
+        stockCount <= 0
+            ? `
+                <div class="stock-badge out">
+                    Out Of Stock
+                </div>
+            `
+            : showStockCount
+                ? `
+                    <div class="stock-badge in">
+                        ${stockCount} Stocks Left
+                    </div>
+                `
+                : `
+                    <div class="stock-badge in">
+                        In Stock
+                    </div>
+                `;
 
     return `
         <div class="product-card">
 
             <div class="product-image">
+
                 ${image
-            ? `<img src="${image}" alt="${escapeHTML(name)}" loading="lazy" onerror="this.src='assets/images/no-image.png';">`
-            : `<span>No Image Yet</span>`
+            ? `
+                        <img
+                            src="${image}"
+                            alt="${escapeHTML(name)}"
+                            loading="lazy"
+                            onerror="this.src='assets/images/no-image.png';"
+                        >
+                    `
+            : `
+                        <span>No Image Yet</span>
+                    `
         }
+
             </div>
 
             <div class="product-info">
@@ -313,11 +374,17 @@ function createProductCard(product, mode) {
                     ${escapeHTML(category)}
                 </span>
 
-                <h3>${escapeHTML(name)}</h3>
+                <h3>
+                    ${escapeHTML(name)}
+                </h3>
 
-                <p>${escapeHTML(description)}</p>
+                <p>
+                    ${escapeHTML(description)}
+                </p>
 
                 ${priceHTML}
+
+                ${stockHTML}
 
                 <div class="product-actions">
 
@@ -329,13 +396,26 @@ function createProductCard(product, mode) {
                         View Details
                     </button>
 
-                    <button
-                        type="button"
-                        class="cart-btn"
-                        onclick="addProductToCartSafe_(${productIndex})"
-                    >
-                        🛒 Add To Cart
-                    </button>
+                 ${stockCount <= 0
+            ? `
+        <button
+            type="button"
+            class="cart-btn"
+            disabled
+            style="opacity:0.55; cursor:not-allowed;">
+            Out Of Stock
+        </button>
+    `
+            : `
+        <button
+            type="button"
+            class="cart-btn"
+            onclick="addProductToCartSafe_(${productIndex})"
+        >
+            🛒 Add To Cart
+        </button>
+    `
+        }
 
                 </div>
 
@@ -344,6 +424,7 @@ function createProductCard(product, mode) {
         </div>
     `;
 }
+
 
 function getProductIndex_(product) {
     return allProducts.findIndex(item => {
@@ -582,7 +663,7 @@ window.addEventListener("click", function (event) {
    REAL ADD TO CART
 ================================ */
 
-const STORE_CART_KEY_PUBLIC = "mn_store_cart";
+const STORE_CART_KEY_PUBLIC = "mn_store_partner_cart";
 
 function addProductToCartSafe_(productIndex) {
     const product =
