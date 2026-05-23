@@ -85,27 +85,29 @@
                     <p>Provide invoice and concern details for proper review.</p>
                 </div>
 
-                <form class="store-form-grid">
+                <form id="returnRequestForm" class="store-form-grid">
 
                     <div class="store-form-group">
                         <label>Invoice Number</label>
-                        <input type="text" placeholder="Enter invoice number">
+                        <input type="text" id="returnInvoiceId" placeholder="Enter invoice number" required>
                     </div>
 
                     <div class="store-form-group">
                         <label>Reason</label>
-
-                        <select>
-                            <option>Damaged Product</option>
-                            <option>Wrong Item</option>
-                            <option>Missing Product</option>
-                            <option>Expired Product</option>
+                        <select id="returnReason" required>
+                            <option value="">Select reason</option>
+                            <option value="Damaged Product">Damaged Product</option>
+                            <option value="Wrong Item">Wrong Item</option>
+                            <option value="Missing Product">Missing Product</option>
+                            <option value="Expired Product">Expired Product</option>
+                            <option value="Other Concern">Other Concern</option>
                         </select>
                     </div>
 
                     <div class="store-form-group full-width">
                         <label>Details</label>
-                        <textarea rows="5" placeholder="Enter concern details here..."></textarea>
+                        <textarea id="returnDetails" rows="5" placeholder="Enter concern details here..."
+                            required></textarea>
                     </div>
 
                     <div class="full-width">
@@ -121,6 +123,10 @@
         </main>
 
     </div>
+
+    <script src="assets/js/api-config.js"></script>
+    <script src="assets/js/store-session.js"></script>
+    <script src="assets/js/store-returns.js"></script>
 
 </body>
 

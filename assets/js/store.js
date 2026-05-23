@@ -6,6 +6,8 @@
 let allProducts = [];
 let visibleCount = 20;
 
+const STORE_CART_KEY_PUBLIC = "mn_store_partner_cart";
+
 /* ===============================
    PAGE MODE DETECTION
 ================================ */
@@ -40,6 +42,8 @@ function getCategoryFromURL() {
 document.addEventListener("DOMContentLoaded", async () => {
     initializeCategoryCards();
     bindStoreEvents();
+    bindHeaderSearch();
+
     await loadProductsFromAPI();
 
     const categoryFromURL = getCategoryFromURL();
@@ -263,9 +267,7 @@ function renderProducts(products, mode) {
 ================================ */
 
 function createProductCard(product, mode) {
-
-    const productIndex =
-        getProductIndex_(product);
+    const productIndex = getProductIndex_(product);
 
     const name =
         product.ProductName ||
@@ -283,8 +285,7 @@ function createProductCard(product, mode) {
         product.description ||
         "";
 
-    const image =
-        getProductImage(product);
+    const image = getProductImage(product);
 
     const wholesalePrice =
         Number(
@@ -305,47 +306,12 @@ function createProductCard(product, mode) {
             mode,
             wholesalePrice,
             promoPrice,
-            discountLabel:
-                product.DiscountLabel || "",
-            bundleName:
-                product.BundleName || ""
+            discountLabel: product.DiscountLabel || "",
+            bundleName: product.BundleName || ""
         });
 
-    /* ===============================
-       STOCK DISPLAY
-    ================================ */
-
-    const stockCount =
-        Number(
-            product.CurrentStock ||
-            product.StockQty ||
-            product.Quantity ||
-            0
-        );
-
-    const showStockCount =
-        String(
-            product.ShowStockCount || ""
-        ).toUpperCase() === "YES";
-
-    const stockHTML =
-        stockCount <= 0
-            ? `
-                <div class="stock-badge out">
-                    Out Of Stock
-                </div>
-            `
-            : showStockCount
-                ? `
-                    <div class="stock-badge in">
-                        ${stockCount} Stocks Left
-                    </div>
-                `
-                : `
-                    <div class="stock-badge in">
-                        In Stock
-                    </div>
-                `;
+    const stockInfo = getStockInfo_(product);
+    const stockHTML = getStockHTML_(stockInfo);
 
     return `
         <div class="product-card">
@@ -396,25 +362,26 @@ function createProductCard(product, mode) {
                         View Details
                     </button>
 
-                 ${stockCount <= 0
+                    ${!stockInfo.isAvailable
             ? `
-        <button
-            type="button"
-            class="cart-btn"
-            disabled
-            style="opacity:0.55; cursor:not-allowed;">
-            Out Of Stock
-        </button>
-    `
+                            <button
+                                type="button"
+                                class="cart-btn"
+                                disabled
+                                style="opacity:0.55; cursor:not-allowed;"
+                            >
+                                Out Of Stock
+                            </button>
+                        `
             : `
-        <button
-            type="button"
-            class="cart-btn"
-            onclick="addProductToCartSafe_(${productIndex})"
-        >
-            🛒 Add To Cart
-        </button>
-    `
+                            <button
+                                type="button"
+                                class="cart-btn"
+                                onclick="addProductToCartSafe_(${productIndex})"
+                            >
+                                🛒 Add To Cart
+                            </button>
+                        `
         }
 
                 </div>
@@ -424,7 +391,6 @@ function createProductCard(product, mode) {
         </div>
     `;
 }
-
 
 function getProductIndex_(product) {
     return allProducts.findIndex(item => {
@@ -440,6 +406,69 @@ function getProductIndex_(product) {
 
         return String(itemKey) === String(productKey);
     });
+}
+
+/* ===============================
+   STOCK HELPERS
+================================ */
+
+function getStockInfo_(product) {
+    const stockStatus =
+        String(
+            product.StockStatus ||
+            product.stockStatus ||
+            ""
+        ).trim().toLowerCase();
+
+    const stockCount =
+        Number(
+            product.CurrentStock ||
+            product.StockQty ||
+            product.Quantity ||
+            0
+        );
+
+    const isAvailable =
+        stockStatus === "in stock" ||
+        stockStatus === "available" ||
+        stockStatus === "yes" ||
+        stockCount > 0;
+
+    const showStockCount =
+        String(product.ShowStockCount || "")
+            .trim()
+            .toUpperCase() === "YES";
+
+    return {
+        stockStatus,
+        stockCount,
+        isAvailable,
+        showStockCount
+    };
+}
+
+function getStockHTML_(stockInfo) {
+    if (!stockInfo.isAvailable) {
+        return `
+            <div class="stock-badge out">
+                Out Of Stock
+            </div>
+        `;
+    }
+
+    if (stockInfo.showStockCount && stockInfo.stockCount > 0) {
+        return `
+            <div class="stock-badge in">
+                ${stockInfo.stockCount} Stocks Left
+            </div>
+        `;
+    }
+
+    return `
+        <div class="stock-badge in">
+            In Stock
+        </div>
+    `;
 }
 
 /* ===============================
@@ -499,10 +528,10 @@ function populateCategoryFilter(products) {
 
         ${categories
             .map(category => `
-                    <option value="${escapeHTML(category)}">
-                        ${escapeHTML(category)}
-                    </option>
-                `)
+                <option value="${escapeHTML(category)}">
+                    ${escapeHTML(category)}
+                </option>
+            `)
             .join("")
         }
     `;
@@ -513,15 +542,17 @@ function populateCategoryFilter(products) {
 ================================ */
 
 function initializeCategoryCards() {
-    const cards = document.querySelectorAll(".category-card");
+    const cards = document.querySelectorAll(".category-card, .category-image-card, .category-chip");
 
     cards.forEach(card => {
         card.addEventListener("click", function (event) {
-            event.preventDefault();
-
             const category = this.dataset.category;
 
-            if (!category || category === "all") {
+            if (!category) return;
+
+            event.preventDefault();
+
+            if (category === "all") {
                 window.location.href = "wholesale.html";
                 return;
             }
@@ -572,8 +603,7 @@ function openProductModal(productIndex) {
 
     if (!product) return;
 
-    const modal =
-        document.getElementById("productModal");
+    const modal = document.getElementById("productModal");
 
     if (!modal) {
         alert(product.ProductName || "Product selected.");
@@ -581,6 +611,7 @@ function openProductModal(productIndex) {
     }
 
     const image = getProductImage(product);
+    const stockInfo = getStockInfo_(product);
 
     setModalImage_("modalProductImage", image);
     setModalText_("modalProductName", product.ProductName || "Unnamed Product");
@@ -598,6 +629,8 @@ function openProductModal(productIndex) {
                 ? `<small>Promo: ₱${formatMoney(product.PromoPrice)}</small>`
                 : ""
             }
+
+            ${getStockHTML_(stockInfo)}
         `;
     }
 
@@ -607,9 +640,21 @@ function openProductModal(productIndex) {
         document.getElementById("modalAddToCartBtn");
 
     if (addToCartBtn) {
-        addToCartBtn.onclick = function () {
-            addProductToCartSafe_(productIndex);
-        };
+        if (!stockInfo.isAvailable) {
+            addToCartBtn.disabled = true;
+            addToCartBtn.innerText = "Out Of Stock";
+            addToCartBtn.style.opacity = "0.55";
+            addToCartBtn.style.cursor = "not-allowed";
+            addToCartBtn.onclick = null;
+        } else {
+            addToCartBtn.disabled = false;
+            addToCartBtn.innerText = "🛒 Add To Cart";
+            addToCartBtn.style.opacity = "1";
+            addToCartBtn.style.cursor = "pointer";
+            addToCartBtn.onclick = function () {
+                addProductToCartSafe_(productIndex);
+            };
+        }
     }
 
     modal.classList.add("active");
@@ -660,16 +705,20 @@ window.addEventListener("click", function (event) {
 });
 
 /* ===============================
-   REAL ADD TO CART
+   ADD TO CART
 ================================ */
 
-const STORE_CART_KEY_PUBLIC = "mn_store_partner_cart";
-
 function addProductToCartSafe_(productIndex) {
-    const product =
-        allProducts[productIndex];
+    const product = allProducts[productIndex];
 
     if (!product) return;
+
+    const stockInfo = getStockInfo_(product);
+
+    if (!stockInfo.isAvailable) {
+        alert("This product is currently out of stock.");
+        return;
+    }
 
     const cart =
         JSON.parse(
@@ -690,24 +739,13 @@ function addProductToCartSafe_(productIndex) {
         );
 
     const cartItem = {
-        productId:
-            product.ProductID,
-
-        name:
-            product.ProductName,
-
-        category:
-            product.Category || "",
-
-        image:
-            getProductImage(product),
-
+        productId: product.ProductID,
+        name: product.ProductName,
+        category: product.Category || "",
+        image: getProductImage(product),
         quantity: 1,
-
-        mode:
-            "WHOLESALE",
-
-        price
+        mode: "WHOLESALE",
+        price: price
     };
 
     if (existingIndex >= 0) {
@@ -736,7 +774,7 @@ function showCartSuccess_(productName) {
    HEADER SEARCH
 ================================ */
 
-document.addEventListener("DOMContentLoaded", () => {
+function bindHeaderSearch() {
     const headerSearchInput =
         document.getElementById("headerSearchInput");
 
@@ -754,7 +792,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-});
+}
 
 function applyHeaderSearch() {
     const headerSearchInput =
@@ -833,3 +871,11 @@ function escapeHTML(value) {
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
 }
+
+/* ===============================
+   GLOBAL FUNCTIONS
+================================ */
+
+window.openProductModal = openProductModal;
+window.closeProductModal = closeProductModal;
+window.addProductToCartSafe_ = addProductToCartSafe_;

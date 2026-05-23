@@ -44,14 +44,14 @@
 
                 <div class="store-topbar-left">
                     <h1>Delivery Tracking</h1>
-                    <p>Track incoming deliveries, shipment updates, driver details, and estimated arrival.</p>
+                    <p>Track delivery progress based on updates from M&N Admin.</p>
                 </div>
 
                 <div class="store-account-card">
-                    <strong>M&N Partner Store</strong>
-                    <span>Delivery Status: Monitoring</span>
-                    <span>Pending Deliveries: 0</span>
-                    <span>Last Updated: Today</span>
+                    <strong id="deliveryStoreName">M&N Partner Store</strong>
+                    <span id="deliveryStatusText">Delivery Status: Monitoring</span>
+                    <span id="pendingDeliveriesText">Pending Deliveries: 0</span>
+                    <span id="deliveryLastUpdatedText">Last Updated: Today</span>
                 </div>
 
             </section>
@@ -61,19 +61,19 @@
                 <div class="store-dashboard-card">
                     <span>📦</span>
                     <h3>Pending</h3>
-                    <p>No pending deliveries yet.</p>
+                    <p id="pendingDeliveryCard">0 pending deliveries.</p>
                 </div>
 
                 <div class="store-dashboard-card">
                     <span>🚚</span>
                     <h3>In Transit</h3>
-                    <p>Deliveries currently on the way will appear here.</p>
+                    <p id="inTransitDeliveryCard">0 deliveries on the way.</p>
                 </div>
 
                 <div class="store-dashboard-card">
                     <span>✅</span>
                     <h3>Completed</h3>
-                    <p>Delivered orders will be recorded for tracking.</p>
+                    <p id="completedDeliveryCard">0 completed deliveries.</p>
                 </div>
 
             </section>
@@ -82,7 +82,9 @@
 
                 <div class="section-heading">
                     <h2>Delivery Records</h2>
-                    <p>Latest delivery updates connected to store orders.</p>
+                    <p>
+                        These records are read-only. Delivery updates are controlled by M&N Admin.
+                    </p>
                 </div>
 
                 <div class="store-table-wrap">
@@ -91,15 +93,15 @@
                             <tr>
                                 <th>Invoice</th>
                                 <th>Order Date</th>
-                                <th>Status</th>
-                                <th>Driver</th>
-                                <th>ETA</th>
+                                <th>Delivery Status</th>
+                                <th>Payment</th>
+                                <th>Total</th>
                             </tr>
                         </thead>
 
-                        <tbody>
+                        <tbody id="deliveriesTableBody">
                             <tr>
-                                <td colspan="5">No deliveries yet.</td>
+                                <td colspan="5">Loading deliveries...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -110,6 +112,10 @@
         </main>
 
     </div>
+
+    <script src="assets/js/api-config.js"></script>
+    <script src="assets/js/store-session.js"></script>
+    <script src="assets/js/store-deliveries.js"></script>
 
 </body>
 

@@ -1,55 +1,114 @@
-/* =========================================
-   M&N STORE APP DASHBOARD
-   BuildFrame Store OS
-========================================= */
+async function initializeStoreDashboard_() {
 
-document.addEventListener("DOMContentLoaded", () => {
-    initializeStoreDashboard_();
-});
-
-function initializeStoreDashboard_() {
     console.log("M&N Store App Dashboard loaded.");
 
     const user =
         JSON.parse(localStorage.getItem("mnUser") || "{}");
 
-    const storeData = {
-        name:
+    const customerId =
+        user.CustomerID || "";
+
+    try {
+
+        const response = await fetch(API.BASE_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "getStorePartnerSummary",
+                customerId: customerId
+            })
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+
+            console.error(result.message);
+
+            return;
+        }
+
+        const summary =
+            result.summary || {};
+
+        setText_(
+            "storeNameText",
+            summary.storeName ||
             user.StoreName ||
-            user.BusinessName ||
-            user.Name ||
-            "M&N Partner Store",
+            "M&N Partner Store"
+        );
 
-        type:
-            user.AccountType ||
-            user.StoreType ||
-            "Wholesale Store",
+        setText_(
+            "storeTypeText",
+            "Account Type: " +
+            (
+                summary.storeType ||
+                user.AccountType ||
+                "Wholesale Store"
+            )
+        );
 
-        status:
-            user.Status ||
-            "Active",
+        setText_(
+            "storeStatusText",
+            "Status: " +
+            (
+                summary.status ||
+                "ACTIVE"
+            )
+        );
 
-        balance:
-            user.OutstandingBalance ||
-            0,
+        setText_(
+            "storeBalanceText",
+            "Outstanding Balance: ₱" +
+            formatMoney_(
+                summary.outstandingBalance || 0
+            )
+        );
 
-        contact:
-            user.ContactNumber ||
-            user.Phone ||
-            "-",
+        setText_(
+            "storeContactText",
+            "Contact: " +
+            (
+                summary.contact ||
+                user.ContactNumber ||
+                "-"
+            )
+        );
 
-        agent:
-            user.AssignedAgentName ||
-            user.AgentName ||
-            "-"
-    };
+        setText_(
+            "storeAgentText",
+            "Assigned Agent: " +
+            (
+                summary.agent ||
+                user.AssignedAgentName ||
+                "-"
+            )
+        );
 
-    setText_("storeNameText", storeData.name);
-    setText_("storeTypeText", "Account Type: " + storeData.type);
-    setText_("storeStatusText", "Status: " + storeData.status);
-    setText_("storeBalanceText", "Outstanding Balance: ₱" + formatMoney_(storeData.balance));
-    setText_("storeContactText", "Contact: " + storeData.contact);
-    setText_("storeAgentText", "Assigned Agent: " + storeData.agent);
+        /* OPTIONAL EXTRA CARDS */
+
+        setText_(
+            "todayOrdersText",
+            summary.todayOrders || 0
+        );
+
+        setText_(
+            "pendingDeliveriesText",
+            summary.pendingDeliveries || 0
+        );
+
+        setText_(
+            "totalPaidText",
+            "₱" +
+            formatMoney_(
+                summary.totalPaid || 0
+            )
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
 }
 
 function setText_(id, value) {

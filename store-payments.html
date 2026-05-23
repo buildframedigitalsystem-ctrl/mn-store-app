@@ -45,14 +45,14 @@
 
                 <div class="store-topbar-left">
                     <h1>Payments & Balance</h1>
-                    <p>Review invoices, outstanding balances, payment status, and store account records.</p>
+                    <p>View your balance and coordinate payments with M&N.</p>
                 </div>
 
                 <div class="store-account-card">
-                    <strong>M&N Partner Store</strong>
-                    <span>Account Type: Wholesale Store</span>
-                    <span>Payment Status: Monitoring</span>
-                    <span>Outstanding Balance: ₱0.00</span>
+                    <strong id="paymentStoreName">M&N Partner Store</strong>
+                    <span id="paymentAccountType">Account Type: Wholesale Store</span>
+                    <span id="paymentStatusText">Payment Status: Monitoring</span>
+                    <span id="paymentBalanceText">Outstanding Balance: ₱0.00</span>
                 </div>
 
             </section>
@@ -62,19 +62,65 @@
                 <div class="store-dashboard-card">
                     <span>💰</span>
                     <h3>Outstanding Balance</h3>
-                    <p>₱0.00 currently recorded.</p>
+                    <p id="outstandingBalanceText">₱0.00 currently recorded.</p>
                 </div>
 
                 <div class="store-dashboard-card">
                     <span>✅</span>
                     <h3>Total Paid</h3>
-                    <p>₱0.00 payment history recorded.</p>
+                    <p id="totalPaidText">₱0.00 payment history recorded.</p>
                 </div>
 
                 <div class="store-dashboard-card">
                     <span>🧾</span>
                     <h3>Pending Invoices</h3>
-                    <p>No pending invoices yet.</p>
+                    <p id="pendingInvoicesText">No pending invoices yet.</p>
+                </div>
+
+            </section>
+
+            <section class="store-section-card">
+
+                <div class="section-heading">
+                    <h2>Choose Payment Option</h2>
+                    <p>
+                        Store partners may choose COD or coordinate online payment directly with M&N.
+                    </p>
+                </div>
+
+                <div class="payment-option-grid">
+
+                    <div class="payment-option-card">
+                        <h3>💵 Cash on Delivery</h3>
+                        <p>
+                            Choose this if you will pay when the order is delivered.
+                            Final collection will be confirmed by M&N admin.
+                        </p>
+
+                        <button type="button" class="payment-btn cod-btn">
+                            COD / Pay Upon Delivery
+                        </button>
+                    </div>
+
+                    <div class="payment-option-card">
+                        <h3>📲 Online Payment</h3>
+                        <p>
+                            For GCash, bank transfer, or other online payment arrangements,
+                            message M&N directly and send your proof of payment.
+                        </p>
+
+                        <a href="https://www.facebook.com/nico.torrevillas" target="_blank"
+                            class="payment-btn online-btn">
+                            Message M&N / Send Proof
+                        </a>
+                    </div>
+
+                </div>
+
+                <div class="payment-reminder-box">
+                    <strong>Important:</strong>
+                    Payment records and balances are confirmed by M&N Admin only.
+                    Store partners can view balances, but cannot edit payment records.
                 </div>
 
             </section>
@@ -83,7 +129,7 @@
 
                 <div class="section-heading">
                     <h2>Payment Records</h2>
-                    <p>Payment history and invoice balance updates will appear here.</p>
+                    <p>Payment history and invoice balance updates will appear here after admin confirmation.</p>
                 </div>
 
                 <div class="store-table-wrap">
@@ -92,14 +138,16 @@
                             <tr>
                                 <th>Date</th>
                                 <th>Invoice</th>
+                                <th>Method</th>
                                 <th>Amount</th>
                                 <th>Status</th>
+                                <th>Proof / Notes</th>
                             </tr>
                         </thead>
 
                         <tbody id="paymentsTableBody">
                             <tr>
-                                <td colspan="4">No payment records yet.</td>
+                                <td colspan="6">No payment records yet.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -111,6 +159,7 @@
 
     </div>
 
+    <script src="assets/js/api-config.js"></script>
     <script src="assets/js/store-payments.js"></script>
 
 </body>

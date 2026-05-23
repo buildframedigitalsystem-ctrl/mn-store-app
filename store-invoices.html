@@ -4,70 +4,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M&N Invoices</title>
+    <title>M&N Store Invoices</title>
 
     <link rel="manifest" href="manifest-store.json">
 
-    <link rel="stylesheet" href="assets/css/base.css">
-    <link rel="stylesheet" href="assets/css/store.css">
+    <link rel="stylesheet" href="assets/css/responsive-fixes.css">
+    <link rel="stylesheet" href="assets/css/store-operations-polish.css">
+    <link rel="stylesheet" href="assets/css/store-dashboard-v2.css?v=11">
 
     <meta name="theme-color" content="#005f2f">
 </head>
 
 <body>
 
-    <header class="store-header">
+    <div class="store-app-layout">
 
-        <div class="images/branding/mn-logo.png">
-            <h1>M&N Store</h1>
-            <p>Invoices</p>
+        <aside class="store-sidebar">
+
+            <div class="store-branding">
+                <img src="images/branding/mn-logo.png" alt="M&N Logo">
+
+                <h2>M&N Store App</h2>
+                <p>Wholesale Partner Portal</p>
+            </div>
+
+            <nav class="store-sidebar-nav">
+                <a href="store-order-form.html">📦 Wholesale Orders</a>
+                <a href="wholesale.html">🛒 Wholesale Products</a>
+                <a href="store-deliveries.html">🚚 Deliveries</a>
+                <a href="store-payments.html">💳 Payments & Balance</a>
+                <a href="store-invoices.html" class="active">🧾 Invoices</a>
+                <a href="store-returns.html">↩ Returns</a>
+            </nav>
+
+        </aside>
+
+        <main class="store-main-content">
+
+            <section class="store-topbar">
+
+                <div class="store-topbar-left">
+                    <h1>Invoices</h1>
+
+                    <p>
+                        View submitted invoices, payment status,
+                        and delivery progress.
+                    </p>
+                </div>
+
+                <div class="store-account-card">
+                    <strong id="invoiceStoreName">
+                        M&N Partner Store
+                    </strong>
+
+                    <span id="invoiceSummaryText">
+                        Invoices: 0
+                    </span>
+
+                    <span>
+                        Read-only invoice records
+                    </span>
+                </div>
+
+            </section>
+
+            <section class="store-section-card">
+
+                <div class="section-heading">
+                    <h2>Invoice Records</h2>
+
+                    <p>
+                        Invoices are generated from finalized orders.
+                        Any corrections or adjustments are managed by M&N Admin.
+                    </p>
+                </div>
+
+                <div class="store-table-wrap">
+
+                    <table class="store-table">
+
+                        <thead>
+                            <tr>
+                                <th>Invoice</th>
+                                <th>Date</th>
+                                <th>Total</th>
+                                <th>Payment</th>
+                                <th>Delivery</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="storeInvoicesTableBody">
+                            <tr>
+                                <td colspan="6">
+                                    Loading invoices...
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- =========================================
+         INVOICE MODAL
+    ========================================== -->
+
+    <div id="invoiceModal" class="invoice-modal">
+
+        <div class="invoice-box">
+
+            <button type="button" class="invoice-close-btn" onclick="closeStoreInvoice_()">
+                ✕
+            </button>
+
+            <div class="invoice-header">
+
+                <div>
+                    <h2>M&N Consumer Goods</h2>
+
+                    <p>
+                        Wholesale • Distribution • Store Network
+                    </p>
+                </div>
+
+                <strong id="invoiceIdText">
+                    -
+                </strong>
+
+            </div>
+
+            <div class="invoice-details-grid">
+
+                <div>
+                    <small>Store / Customer</small>
+                    <strong id="invoiceCustomerText">-</strong>
+                </div>
+
+                <div>
+                    <small>Contact</small>
+                    <strong id="invoiceContactText">-</strong>
+                </div>
+
+                <div>
+                    <small>Payment</small>
+                    <strong id="invoicePaymentStatusText">-</strong>
+                </div>
+
+                <div>
+                    <small>Delivery</small>
+                    <strong id="invoiceDeliveryStatusText">-</strong>
+                </div>
+
+                <div>
+                    <small>Date</small>
+                    <strong id="invoiceDateText">-</strong>
+                </div>
+
+            </div>
+
+            <div class="invoice-items-section">
+
+                <h3>Ordered Products</h3>
+
+                <div class="store-table-wrap">
+
+                    <table class="store-table">
+
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="invoiceItemsBody">
+
+                            <tr>
+                                <td colspan="4">
+                                    No items found.
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            <div class="invoice-total-box">
+
+                <span>Total Amount</span>
+
+                <strong id="invoiceTotalText">
+                    ₱0.00
+                </strong>
+
+            </div>
+
+            <div class="invoice-actions">
+
+                <button type="button" class="store-primary-btn" onclick="window.print()">
+                    Print Invoice
+                </button>
+
+            </div>
+
         </div>
 
-        <nav class="store-nav">
-            <a href="index.html">Dashboard</a>
-            <a href="wholesale.html">Products</a>
-            <a href="cart.html">Cart</a>
-            <a href="store-payments.html">Payments</a>
-        </nav>
+    </div>
 
-    </header>
-
-    <main class="store-container">
-
-        <section class="page-hero">
-            <h2>Invoices & Billing</h2>
-            <p>View invoices and order billing history.</p>
-        </section>
-
-        <section class="dashboard-card">
-
-            <table class="admin-table">
-
-                <thead>
-                    <tr>
-                        <th>Invoice #</th>
-                        <th>Date</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <tr>
-                        <td colspan="5">
-                            No invoices available yet.
-                        </td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </section>
-
-    </main>
+    <script src="assets/js/api-config.js"></script>
+    <script src="assets/js/store-session.js"></script>
+    <script src="assets/js/store-invoices.js"></script>
 
 </body>
 

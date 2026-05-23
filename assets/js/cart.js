@@ -70,10 +70,18 @@ function renderCart_() {
                 </div>
 
                 <div class="cart-item-controls">
-                    <button onclick="changeQty_(${index}, -1)">−</button>
-                    <span>${qty}</span>
-                    <button onclick="changeQty_(${index}, 1)">+</button>
-                </div>
+    <button onclick="changeQty_(${index}, -1)">−</button>
+
+    <input
+        type="number"
+        min="1"
+        value="${qty}"
+        onchange="setQty_(${index}, this.value)"
+        class="cart-qty-input"
+    >
+
+    <button onclick="changeQty_(${index}, 1)">+</button>
+</div>
 
                 <div class="cart-item-total">
                     ₱${formatMoney_(total)}
@@ -103,6 +111,19 @@ function changeQty_(index, amount) {
     renderCart_();
 }
 
+function setQty_(index, value) {
+    const cart = getCart_();
+
+    if (!cart[index]) return;
+
+    const qty = Math.max(1, Number(value || 1));
+
+    cart[index].quantity = qty;
+
+    saveCart_(cart);
+    renderCart_();
+}
+
 function removeItem_(index) {
     const cart = getCart_();
 
@@ -118,3 +139,7 @@ function formatMoney_(value) {
         maximumFractionDigits: 2
     });
 }
+
+window.changeQty_ = changeQty_;
+window.setQty_ = setQty_;
+window.removeItem_ = removeItem_;
