@@ -56,6 +56,10 @@
                     ↩ Returns
                 </a>
 
+                <a href="#" onclick="logoutStoreUser_(); return false;">
+                    🚪 Logout
+                </a>
+
                 <div class="store-sidebar-cta">
                     <span>🚀 Ready to grow?</span>
                     <strong>Build My Retail Store</strong>
@@ -132,8 +136,8 @@
 
 
             <!-- =========================================
-     STORE QUICK STATS
-========================================= -->
+                        STORE QUICK STATS
+            ========================================= -->
             <section class="store-quick-stats">
 
                 <div class="quick-stat-card">
@@ -168,6 +172,35 @@
                     </div>
                 </div>
 
+            </section>
+
+
+            <section class="store-section-card">
+                <div class="section-heading">
+                    <h2>Open Orders & Balance Reminders</h2>
+                    <p>Invoices that still need payment, delivery, or admin updates.</p>
+                </div>
+
+                <div class="store-table-wrap">
+                    <table class="store-table">
+                        <thead>
+                            <tr>
+                                <th>Invoice</th>
+                                <th>Date</th>
+                                <th>Delivery</th>
+                                <th>Payment</th>
+                                <th>Balance</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="dashboardOpenOrdersBody">
+                            <tr>
+                                <td colspan="6">Loading open orders...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </section>
 
 

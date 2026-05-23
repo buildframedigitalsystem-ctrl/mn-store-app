@@ -2,6 +2,7 @@
     "id": "/mn-store-app",
     "name": "M&N Store Partner App",
     "short_name": "M&N Store",
+    "version": "2.0.0",
     "description": "Partner store ordering, invoices, deliveries, payments, and returns system.",
     "start_url": "./index.html",
     "scope": "./",

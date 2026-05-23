@@ -35,6 +35,9 @@
                 <a href="store-deliveries.html">🚚 Deliveries</a>
                 <a href="store-payments.html" class="active">💳 Payments & Balance</a>
                 <a href="store-returns.html">↩ Returns</a>
+                <a href="#" onclick="logoutStoreUser_(); return false;">
+                    🚪 Logout
+                </a>
             </nav>
 
         </aside>
@@ -138,8 +141,8 @@
                             <tr>
                                 <th>Date</th>
                                 <th>Invoice</th>
-                                <th>Method</th>
                                 <th>Amount</th>
+                                <th>Method</th>
                                 <th>Status</th>
                                 <th>Proof / Notes</th>
                             </tr>
@@ -160,6 +163,7 @@
     </div>
 
     <script src="assets/js/api-config.js"></script>
+    <script src="assets/js/store-session.js"></script>
     <script src="assets/js/store-payments.js"></script>
 
 </body>

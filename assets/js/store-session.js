@@ -70,6 +70,19 @@ function displayStoreSessionData_() {
     });
 }
 
+function logoutStoreUser_() {
+    localStorage.removeItem("mnUser");
+    localStorage.removeItem("mnCustomerSession");
+    localStorage.removeItem("mnStoreSession");
+    localStorage.removeItem("mn_store_partner_cart");
+
+    alert("Logged out successfully.");
+
+    window.location.href = "store-login.html";
+}
+
+window.logoutStoreUser_ = logoutStoreUser_;
+
 /* =========================================
    AUTO INIT
 ========================================= */

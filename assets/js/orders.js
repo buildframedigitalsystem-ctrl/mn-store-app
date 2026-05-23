@@ -37,7 +37,7 @@ function requireSessionSafe_() {
     const session = getCurrentStoreSession_();
 
     if (!session.CustomerID) {
-        window.location.href = "customer-login.html";
+        window.location.href = "store-login.html";
     }
 }
 
