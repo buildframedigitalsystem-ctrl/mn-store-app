@@ -13,6 +13,54 @@
     <link rel="stylesheet" href="assets/css/store-dashboard-v2.css?v=11">
 
     <meta name="theme-color" content="#005f2f">
+
+    <style>
+        .centered-header {
+            text-align: center;
+            border-bottom: 2px solid #dbe4dc;
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+        }
+
+        .centered-header h2 {
+            font-size: 34px;
+            margin-bottom: 8px;
+            color: #005f2f;
+        }
+
+        .centered-header p {
+            margin-bottom: 10px;
+            color: #475569;
+        }
+
+        .invoice-contact-details {
+            margin-top: 12px;
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .invoice-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .invoice-signature-box {
+            margin-top: 24px;
+            text-align: left;
+        }
+
+        .invoice-signature-box img {
+            max-width: 260px;
+            margin-top: 10px;
+            display: block;
+        }
+    </style>
 </head>
 
 <body>
@@ -51,7 +99,8 @@
 
                     <p>
                         View submitted invoices, payment status,
-                        and delivery progress.
+                        delivery progress, ordered products,
+                        deductions, and balance due.
                     </p>
                 </div>
 
@@ -78,7 +127,8 @@
 
                     <p>
                         Invoices are generated from finalized orders.
-                        Any corrections or adjustments are managed by M&N Admin.
+                        Any corrections, returns, deductions, or payment adjustments
+                        are managed by M&N Admin.
                     </p>
                 </div>
 
@@ -115,10 +165,7 @@
 
     </div>
 
-    <!-- =========================================
-         INVOICE MODAL
-    ========================================== -->
-
+    <!-- INVOICE MODAL -->
     <div id="invoiceModal" class="invoice-modal">
 
         <div class="invoice-box">
@@ -127,19 +174,22 @@
                 ✕
             </button>
 
-            <div class="invoice-header">
+            <div class="invoice-header centered-header">
 
-                <div>
-                    <h2>M&N Consumer Goods</h2>
+                <h2>M&N Consumer Goods</h2>
 
-                    <p>
-                        Wholesale • Distribution • Store Network
-                    </p>
-                </div>
+                <p>
+                    Wholesale • Store Network • Distribution
+                </p>
 
                 <strong id="invoiceIdText">
                     -
                 </strong>
+
+                <div class="invoice-contact-details">
+                    <span>M&N Consumer Goods</span>
+                    <span>Wholesale • Store Network • Distribution</span>
+                </div>
 
             </div>
 
@@ -148,11 +198,17 @@
                 <div>
                     <small>Store / Customer</small>
                     <strong id="invoiceCustomerText">-</strong>
+                    <p id="invoiceAddressText">-</p>
                 </div>
 
                 <div>
                     <small>Contact</small>
                     <strong id="invoiceContactText">-</strong>
+                </div>
+
+                <div>
+                    <small>Order Type</small>
+                    <strong id="invoiceOrderTypeText">Wholesale</strong>
                 </div>
 
                 <div>
@@ -190,13 +246,11 @@
                         </thead>
 
                         <tbody id="invoiceItemsBody">
-
                             <tr>
                                 <td colspan="4">
                                     No items found.
                                 </td>
                             </tr>
-
                         </tbody>
 
                     </table>
@@ -205,21 +259,68 @@
 
             </div>
 
-            <div class="invoice-total-box">
+            <div class="invoice-summary-block">
 
-                <span>Total Amount</span>
+                <div class="invoice-summary-row">
+                    <span>Items Total</span>
+                    <strong id="invoiceItemsTotalText">₱0.00</strong>
+                </div>
 
-                <strong id="invoiceTotalText">
-                    ₱0.00
-                </strong>
+                <div class="invoice-summary-row">
+                    <span>Discount</span>
+                    <strong id="invoiceDiscountText">₱0.00</strong>
+                </div>
 
+                <div class="invoice-summary-row">
+                    <span>Delivery Fee</span>
+                    <strong id="invoiceDeliveryFeeText">₱0.00</strong>
+                </div>
+
+                <div class="invoice-summary-row">
+                    <span>Subtotal</span>
+                    <strong id="invoiceSubtotalText">₱0.00</strong>
+                </div>
+
+                <hr>
+
+                <div class="invoice-summary-row">
+                    <span>Less Partial Payments</span>
+                    <strong id="invoicePartialPaymentsText">₱0.00</strong>
+                </div>
+
+                <div class="invoice-summary-row">
+                    <span>Less Returns</span>
+                    <strong id="invoiceReturnsText">₱0.00</strong>
+                </div>
+
+                <hr>
+
+                <div class="invoice-summary-row total-row">
+                    <span>BALANCE DUE</span>
+                    <strong id="invoiceBalanceDueText">₱0.00</strong>
+                </div>
+
+            </div>
+
+            <div class="invoice-notes-box">
+                <small>Notes</small>
+                <p id="invoiceNotesText">-</p>
+            </div>
+
+            <div class="invoice-signature-box">
+                <small>Customer Signature</small>
+                <img id="invoiceSignatureImage" alt="Customer Signature">
             </div>
 
             <div class="invoice-actions">
 
-                <button type="button" class="store-primary-btn" onclick="window.print()">
-                    Print Invoice
-                </button>
+                <div class="invoice-actions">
+
+                    <button type="button" class="store-primary-btn" onclick="printInvoiceModal()">
+                        Print Invoice
+                    </button>
+
+                </div>
 
             </div>
 
@@ -229,6 +330,7 @@
 
     <script src="assets/js/api-config.js"></script>
     <script src="assets/js/store-session.js"></script>
+    <script src="assets/js/invoice.js"></script>
     <script src="assets/js/store-invoices.js"></script>
 
 </body>

@@ -143,3 +143,13 @@ function formatMoney_(value) {
 window.changeQty_ = changeQty_;
 window.setQty_ = setQty_;
 window.removeItem_ = removeItem_;
+
+function clearCart_() {
+    localStorage.removeItem(STORE_CART_KEY);
+
+    renderCart_();
+
+    alert("Cart cleared.");
+}
+
+window.clearCart_ = clearCart_;

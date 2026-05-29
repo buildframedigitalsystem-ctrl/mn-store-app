@@ -7,6 +7,7 @@ let orderCart = [];
 let signatureCanvas = null;
 let signatureCtx = null;
 let isSigning = false;
+let recentStoreOrders = [];
 
 const STORE_CART_KEY = "mn_store_partner_cart";
 
@@ -58,7 +59,7 @@ function getApiUrl_() {
         return API.BASE_URL;
     }
 
-    return "https://script.google.com/macros/s/AKfycbzbUww2SKIl6uqQvPqLtO6L35A0Xw5Ny0N5hjq16JOguAiLUAovKMdUagJ9SgK1fOSJ/exec";
+    throw new Error("API.BASE_URL is missing. Please check api-config.js.");
 }
 
 /* CART */
@@ -225,8 +226,14 @@ async function submitStoreOrder_(e) {
 
     const payload = {
         action: "submitStoreOrder",
-        storeId: session.CustomerID || "STORE001",
+        storeId:
+            session.CustomerID ||
+            session.StoreID ||
+            session.customerId ||
+            "",
         customerName,
+        customerAddress:
+            document.getElementById("customerAddress").value,
         contactNumber,
         orderType: "Wholesale",
         paymentStatus,
@@ -372,7 +379,8 @@ async function loadRecentOrders_() {
             return;
         }
 
-        const rows = result.rows || [];
+        recentStoreOrders = result.rows || [];
+        const rows = recentStoreOrders;
 
         if (!rows.length) {
             tbody.innerHTML = `
@@ -383,30 +391,33 @@ async function loadRecentOrders_() {
             return;
         }
 
-        tbody.innerHTML = rows.map(order => `
-            <tr>
-                <td>${order.InvoiceID || "-"}</td>
-                <td>${order.CustomerName || "-"}</td>
-                <td>${order.OrderType || "Wholesale"}</td>
-                <td>₱${formatMoney_(order.TotalAmount || 0)}</td>
-                <td>${order.PaymentStatus || "Unpaid"}</td>
-                <td>${order.DeliveryStatus || "Pending"}</td>
-                <td>
-                    <button type="button" class="save-btn" onclick="window.print()">
-                        Print
-                    </button>
-                </td>
-            </tr>
-        `).join("");
+        tbody.innerHTML = rows.map((order, index) => `
+    <tr>
+        <td>${order.InvoiceID || "-"}</td>
+        <td>${order.CustomerName || "-"}</td>
+        <td>${order.OrderType || "Wholesale"}</td>
+        <td>₱${formatMoney_(order.TotalAmount || 0)}</td>
+        <td>${order.PaymentStatus || "Unpaid"}</td>
+        <td>${order.DeliveryStatus || "Pending"}</td>
+        <td>
+            <button 
+                type="button" 
+                class="save-btn" 
+                onclick="openRecentInvoiceByIndex_(${index})">
+                View Invoice
+            </button>
+        </td>
+    </tr>
+    `).join("");
 
     } catch (error) {
         console.error(error);
 
         tbody.innerHTML = `
-            <tr>
-                <td colspan="7">Connection error.</td>
-            </tr>
-        `;
+            < tr >
+            <td colspan="7">Connection error.</td>
+            </tr >
+            `;
     }
 }
 
@@ -509,8 +520,94 @@ function escapeHTML_(value) {
         .replaceAll("'", "&#039;");
 }
 
+function openRecentInvoice_(order) {
+    const modal = document.getElementById("invoiceModal");
+
+    if (!modal) return;
+
+    setText_("invoiceIdText", order.InvoiceID || "-");
+    setText_("invoiceCustomerText", order.CustomerName || "-");
+    setText_("invoiceContactText", order.ContactNumber || "-");
+    setText_("invoiceOrderTypeText", order.OrderType || "Wholesale");
+    setText_("invoicePaymentStatusText", order.PaymentStatus || "Unpaid");
+    setText_("invoiceDeliveryStatusText", order.DeliveryStatus || "Pending");
+    setText_("invoiceDateText", order.OrderDate || order.CreatedAt || "-");
+    setText_("invoiceNotesText", order.Notes || order.OrderNotes || "-");
+    setText_("invoiceTotalText", "₱" + formatMoney_(order.TotalAmount || 0));
+
+    let items = [];
+
+    if (Array.isArray(order.Items)) {
+        items = order.Items;
+    } else if (typeof order.Items === "string" && order.Items.trim()) {
+        try {
+            items = JSON.parse(order.Items);
+        } catch (error) {
+            console.warn("Could not parse invoice items:", order.Items);
+        }
+    }
+
+    renderInvoiceItems_(items);
+
+    const signatureImage = document.getElementById("invoiceSignatureImage");
+
+    if (signatureImage) {
+        signatureImage.src = order.SignatureImage || "";
+    }
+
+    modal.style.display = "flex";
+    modal.style.visibility = "visible";
+    modal.style.opacity = "1";
+
+}
+
+function openRecentInvoiceByIndex_(index) {
+
+    const order = recentStoreOrders[index];
+
+    if (!order) {
+        alert("Invoice data not found.");
+        return;
+    }
+
+    let items = [];
+
+    if (Array.isArray(order.Items)) {
+        items = order.Items;
+
+    } else if (
+        typeof order.Items === "string" &&
+        order.Items.trim()
+    ) {
+        try {
+            items = JSON.parse(order.Items);
+
+        } catch (error) {
+            console.warn("Could not parse invoice items.");
+        }
+    }
+
+    showSimpleInvoice_(
+        {
+            invoiceId: order.InvoiceID || "-"
+        },
+        {
+            customerName: order.CustomerName || "-",
+            contactNumber: order.ContactNumber || "-",
+            orderType: order.OrderType || "Wholesale",
+            paymentStatus: order.PaymentStatus || "Unpaid",
+            orderNotes: order.OrderNotes || "-",
+            totalAmount: order.TotalAmount || 0,
+            signatureImage: order.SignatureImage || "",
+            items: items
+        }
+    );
+}
+
 /* GLOBALS */
 
 window.changeOrderQty_ = changeOrderQty_;
 window.removeOrderItem_ = removeOrderItem_;
 window.closeSimpleInvoice_ = closeSimpleInvoice_;
+window.openRecentInvoice_ = openRecentInvoice_;
+window.openRecentInvoiceByIndex_ = openRecentInvoiceByIndex_;

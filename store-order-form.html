@@ -7,8 +7,7 @@
     <title>M&N Store Order Form</title>
 
     <link rel="stylesheet" href="assets/css/responsive-fixes.css">
-    <link rel="stylesheet" href="assets/css/store-order-form-v2.css?v=2">
-
+    <link rel="stylesheet" href="assets/css/store-order-form-v2.css?v=101">
     <link rel="icon" href="images/branding/mn-logo.png">
     <link rel="manifest" href="manifest-store.json">
     <meta name="theme-color" content="#005f2f">
@@ -39,6 +38,11 @@
                     <div class="form-group">
                         <label for="customerName">Customer / Store Name</label>
                         <input type="text" id="customerName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customerAddress">Store Partner Address</label>
+                        <input type="text" id="customerAddress" placeholder="Store address / delivery address">
                     </div>
 
                     <div class="form-group">
@@ -143,128 +147,232 @@
 
     <div id="invoiceModal" class="invoice-modal">
 
-        <div class="invoice-preview-header">
+        <div class="invoice-modal-content modern-invoice">
 
-            <div>
-                <h2>Invoice Preview</h2>
+            <div class="invoice-topbar">
 
-                <p>
-                    Review your order before printing or waiting for admin confirmation.
-                </p>
-            </div>
-
-            <div class="invoice-badge" id="invoiceIdText">
-                Pending Invoice
-            </div>
-
-        </div>
-        <div class="invoice-modal-content">
-
-            <div class="invoice-header">
                 <div>
-                    <h2>M&N Consumer Goods</h2>
-                    <p>Official Invoice</p>
+                    <h2>Invoice Preview</h2>
+                    <p>
+                        Review your order before printing or waiting for admin confirmation.
+                    </p>
                 </div>
 
-                <button type="button" class="close-invoice-btn" onclick="closeSimpleInvoice_()">
-                    ✕
-                </button>
+                <div class="invoice-status-badge" id="invoiceBadgeText">
+                    Pending Invoice
+                </div>
+
             </div>
 
-            <div class="invoice-body">
+            <div class="invoice-print-area" id="invoicePrintArea">
 
-                <div class="invoice-grid">
-                    <div>
-                        <strong>Invoice ID:</strong>
-                        <p id="invoiceIdText">-</p>
+                <div class="invoice-company-header">
+
+                    <div class="invoice-company-left">
+
+                        <img src="assets/images/branding/mn-logo.png" alt="M&N Logo" class="invoice-logo">
+
+                        <div>
+
+                            <h1>M&N Consumer Goods</h1>
+
+                            <p>
+                                Wholesale • Store Network • Distribution
+                            </p>
+
+                            <div class="invoice-contact-lines">
+
+                                <span>📞 +63 976 011 0243</span>
+                                <span>📧 buildframe.digitalsystem@gmail.com</span>
+                                <span>📧 chinveloso.consmaterials@gmail.com</span>
+
+                            </div>
+
+                        </div>
+
                     </div>
 
-                    <div>
-                        <strong>Customer:</strong>
-                        <p id="invoiceCustomerText">-</p>
+                    <div class="invoice-company-right">
+
+                        <h2>SALES INVOICE</h2>
+
+                        <strong id="invoiceIdText">
+                            -
+                        </strong>
+
                     </div>
 
-                    <div>
-                        <strong>Contact Number:</strong>
-                        <p id="invoiceContactText">-</p>
+                </div>
+
+                <div class="invoice-info-grid">
+
+                    <div class="invoice-info-card">
+                        <label>Customer</label>
+                        <h3 id="invoiceCustomerText">-</h3>
                     </div>
 
-                    <div>
-                        <strong>Order Type:</strong>
-                        <p id="invoiceOrderTypeText">-</p>
+                    <div class="invoice-info-card">
+                        <label>Contact Number</label>
+                        <h3 id="invoiceContactText">-</h3>
                     </div>
 
-                    <div>
-                        <strong>Payment Status:</strong>
-                        <p id="invoicePaymentStatusText">-</p>
+                    <div class="invoice-info-card">
+                        <label>Order Type</label>
+                        <h3 id="invoiceOrderTypeText">-</h3>
                     </div>
 
-                    <div>
-                        <strong>Delivery Status:</strong>
-                        <p id="invoiceDeliveryStatusText">-</p>
+                    <div class="invoice-info-card">
+                        <label>Payment Status</label>
+                        <h3 id="invoicePaymentStatusText">-</h3>
                     </div>
 
-                    <div>
-                        <strong>Order Date:</strong>
-                        <p id="invoiceDateText">-</p>
+                    <div class="invoice-info-card">
+                        <label>Delivery Status</label>
+                        <h3 id="invoiceDeliveryStatusText">-</h3>
                     </div>
+
+                    <div class="invoice-info-card">
+                        <label>Order Date</label>
+                        <h3 id="invoiceDateText">-</h3>
+                    </div>
+
                 </div>
 
                 <div class="invoice-items-section">
+
                     <h3>Ordered Products</h3>
 
-                    <div class="table-wrap">
-                        <table class="orders-table">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Qty</th>
-                                    <th>Price</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
+                    <table class="invoice-items-table">
 
-                            <tbody id="invoiceItemsBody">
-                                <tr>
-                                    <td colspan="4">No items found.</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Qty</th>
+                                <th>Price</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="invoiceItemsBody">
+
+                            <tr>
+                                <td colspan="4">
+                                    No items found.
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="invoice-summary-box">
+
+                    <div class="invoice-summary-row">
+                        <span>Items Total</span>
+                        <strong id="invoiceItemsTotalText">
+                            ₱0.00
+                        </strong>
                     </div>
+
+                    <div class="invoice-summary-row">
+                        <span>Discount</span>
+                        <strong id="invoiceDiscountText">
+                            ₱0.00
+                        </strong>
+                    </div>
+
+                    <div class="invoice-summary-row">
+                        <span>Delivery Fee</span>
+                        <strong id="invoiceDeliveryFeeText">
+                            ₱0.00
+                        </strong>
+                    </div>
+
+                    <div class="invoice-summary-row">
+                        <span>Subtotal</span>
+                        <strong id="invoiceSubtotalText">
+                            ₱0.00
+                        </strong>
+                    </div>
+
+                    <div class="invoice-summary-divider"></div>
+
+                    <div class="invoice-summary-row">
+                        <span>Less Partial Payments</span>
+                        <strong id="invoicePartialText">
+                            ₱0.00
+                        </strong>
+                    </div>
+
+                    <div class="invoice-summary-row">
+                        <span>Less Returns</span>
+                        <strong id="invoiceReturnsText">
+                            ₱0.00
+                        </strong>
+                    </div>
+
+                    <div class="invoice-summary-divider"></div>
+
+                    <div class="invoice-balance-row">
+                        <span>BALANCE DUE</span>
+                        <strong id="invoiceTotalText">
+                            ₱0.00
+                        </strong>
+                    </div>
+
                 </div>
 
-                <div class="invoice-total-box">
-                    <h3>Total Amount</h3>
-                    <h1 id="invoiceTotalText">₱0</h1>
+                <div class="invoice-notes-box">
+
+                    <strong>Notes</strong>
+
+                    <p id="invoiceNotesText">
+                        -
+                    </p>
+
                 </div>
 
-                <div class="invoice-notes">
-                    <strong>Order Notes</strong>
-                    <p id="invoiceNotesText">-</p>
-                </div>
+                <div class="invoice-signature-box">
 
-                <div class="invoice-signature">
-                    <strong>Customer Signature</strong><br>
+                    <strong>Customer Signature</strong>
+
                     <img id="invoiceSignatureImage" src="" alt="Signature">
+
                 </div>
 
             </div>
 
             <div class="invoice-actions">
+
                 <button type="button" class="clear-btn" onclick="closeSimpleInvoice_()">
+
                     Close
+
                 </button>
 
-                <button type="button" class="save-btn" onclick="window.print()">
-                    Print Invoice
+                <button type="button" class="save-btn" onclick="printInvoiceModal()">
+
+                    Print Preview
+
                 </button>
+
+                <a href="store-invoices.html" class="save-btn">
+
+                    View Final Invoice
+
+                </a>
+
             </div>
 
         </div>
+
     </div>
 
     <script src="assets/js/api-config.js"></script>
     <script src="assets/js/store-session.js"></script>
+    <script src="assets/js/invoice.js"></script>
     <script src="assets/js/orders.js?v=2"></script>
 
 </body>

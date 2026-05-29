@@ -1,3 +1,11 @@
+.top-bar .brand img {
+    width: 70px !important;
+    height: 70px !important;
+    max-width: 70px !important;
+    max-height: 70px !important;
+    object-fit: contain !important;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -414,4 +422,58 @@ body {
 
 .store-sidebar-cta a:hover {
     background: #008f4a;
+}
+
+/* =========================================
+   FORCE LOGO SIZE FIX
+========================================= */
+
+.top-bar .brand img {
+    width: 70px !important;
+    height: 70px !important;
+    max-width: 70px !important;
+    max-height: 70px !important;
+    object-fit: contain !important;
+    display: block;
+}
+
+.invoice-company img {
+    width: 90px !important;
+    height: auto !important;
+    max-width: 90px !important;
+    object-fit: contain !important;
+}
+
+@media print {
+    body * {
+        visibility: hidden !important;
+    }
+
+    #invoiceModal,
+    #invoiceModal * {
+        visibility: visible !important;
+    }
+
+    #invoiceModal {
+        position: absolute !important;
+        inset: 0 !important;
+        display: block !important;
+        background: white !important;
+        overflow: visible !important;
+        padding: 0 !important;
+    }
+
+    .invoice-modal-content {
+        max-width: 100% !important;
+        max-height: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        overflow: visible !important;
+    }
+
+    .invoice-preview-header,
+    .invoice-actions,
+    .close-invoice-btn {
+        display: none !important;
+    }
 }
